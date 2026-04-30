@@ -220,7 +220,7 @@ export default function DashboardPage() {
                     </div>
                     {loading ? (
                         <div className="skeleton" style={{ height: 220, borderRadius: "var(--radius-sm)" }} />
-                    ) : !data?.expenseByCategory.length ? (
+                    ) : !data?.expenseByCategory?.length ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">📊</div>
                             <div className="empty-state-text">Belum ada pengeluaran bulan ini</div>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                             <div key={i} className="skeleton" style={{ height: 50 }} />
                         ))}
                     </div>
-                ) : !data?.recentTransactions.length ? (
+                ) : !data?.recentTransactions?.length ? (
                     <div className="empty-state">
                         <div className="empty-state-icon">💸</div>
                         <div className="empty-state-title">Belum ada transaksi</div>

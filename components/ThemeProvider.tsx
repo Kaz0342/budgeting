@@ -3,7 +3,7 @@
 // ThemeProvider — manage dark mode via localStorage + data-theme attribute
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "cyberpunk";
 
 const ThemeContext = createContext<{
     theme: Theme;
@@ -26,7 +26,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const toggleTheme = () => {
-        const next = theme === "light" ? "dark" : "light";
+        let next: Theme = "light";
+        if (theme === "light") next = "dark";
+        else if (theme === "dark") next = "cyberpunk";
+        else if (theme === "cyberpunk") next = "light";
+
         setTheme(next);
         localStorage.setItem("theme", next);
         document.documentElement.setAttribute("data-theme", next);

@@ -93,6 +93,18 @@ export function Sidebar() {
         });
     };
 
+    const getThemeIcon = () => {
+        if (theme === "light") return "🌙";
+        if (theme === "dark") return "🦾"; // Cyberpunk transition icon
+        return "☀️";
+    };
+
+    const getThemeText = () => {
+        if (theme === "light") return "Dark Mode";
+        if (theme === "dark") return "Cyberpunk Mode";
+        return "Light Mode";
+    };
+
     return (
         <>
             {/* Top Bar for Mobile */}
@@ -106,9 +118,9 @@ export function Sidebar() {
                 <button
                     className="theme-toggle-icon"
                     onClick={toggleTheme}
-                    aria-label="Toggle dark mode"
+                    aria-label="Toggle theme"
                 >
-                    {theme === "dark" ? "☀️" : "🌙"}
+                    {getThemeIcon()}
                 </button>
             </header>
 
@@ -150,12 +162,12 @@ export function Sidebar() {
                     <button
                         className="theme-toggle"
                         onClick={toggleTheme}
-                        aria-label="Toggle dark mode"
+                        aria-label="Toggle theme"
                         id="theme-toggle-btn"
-                        title={isCollapsed ? (theme === "dark" ? "Light Mode" : "Dark Mode") : undefined}
+                        title={isCollapsed ? getThemeText() : undefined}
                     >
-                        <span>{theme === "dark" ? "☀️" : "🌙"}</span>
-                        <span className="theme-toggle-text">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                        <span>{getThemeIcon()}</span>
+                        <span className="theme-toggle-text">{getThemeText()}</span>
                     </button>
                 </div>
             </aside>

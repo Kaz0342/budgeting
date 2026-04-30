@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id                    Int                    @id @default(autoincrement())
+  name                  String
+  type                  String
+  icon                  String                 @default("💰")
+  color                 String                 @default("#6366f1")
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  amount      Int
+  type        String
+  description String
+  date        DateTime @default(now())
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([date])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model Budget {
+  id          Int      @id @default(autoincrement())
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  limitAmount Int
+  month       Int
+  year        Int
+
+  @@unique([categoryId, month, year])
+  @@map("budgets")
+}
+
+// Transaksi rutin bulanan — auto-generate setiap bulan
+model RecurringTransaction {
+  id          Int      @id @default(autoincrement())
+  amount      Int
+  type        String   // "INCOME" | "EXPENSE"
+  description String
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  dayOfMonth  Int      // tanggal berapa setiap bulan (1-28)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([categoryId])
+  @@map("recurring_transactions")
+}
+
+// Tracking target tabungan / savings goal
+model SavingsGoal {
+  id           Int       @id @default(autoincrement())
+  name         String
+  icon         String    @default("🎯")
+  targetAmount Int
+  savedAmount  Int       @default(0)
+  deadline     DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@map("savings_goals")
+}

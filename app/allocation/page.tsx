@@ -396,8 +396,28 @@ export default function AllocationPage() {
             {/* Loading */}
             {loading ? (
                 <div className="budgets-grid">
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="skeleton" style={{ height: 180, borderRadius: "var(--radius-lg)" }} />
+                    {[1, 2].map(i => (
+                        <div key={i} className="card" style={{ padding: 18 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "var(--radius-md)", flexShrink: 0 }} />
+                                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                                    <div className="skeleton" style={{ width: "50%", height: 16, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: "70%", height: 12, borderRadius: 4 }} />
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                    <div className="skeleton" style={{ width: 50, height: 10, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: 110, height: 20, borderRadius: 4 }} />
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
+                                    <div className="skeleton" style={{ width: 70, height: 10, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: 110, height: 20, borderRadius: 4 }} />
+                                </div>
+                            </div>
+                            <div className="skeleton" style={{ width: "100%", height: 8, borderRadius: 99, marginBottom: 10 }} />
+                            <div className="skeleton" style={{ width: 120, height: 12, borderRadius: 4 }} />
+                        </div>
                     ))}
                 </div>
             ) : income === 0 ? (

@@ -488,7 +488,33 @@ export default function GoalsPage() {
             {loading ? (
                 <div className="budgets-grid">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="skeleton" style={{ height: 180, borderRadius: "var(--radius-lg)" }} />
+                        <div key={i} className="card" style={{ padding: 18 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                                <div className="skeleton" style={{ width: 48, height: 48, borderRadius: "var(--radius-md)", flexShrink: 0 }} />
+                                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                                    <div className="skeleton" style={{ width: "70%", height: 16, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: "50%", height: 12, borderRadius: 4 }} />
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                    <div className="skeleton" style={{ width: 60, height: 10, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: 100, height: 18, borderRadius: 4 }} />
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
+                                    <div className="skeleton" style={{ width: 40, height: 10, borderRadius: 4 }} />
+                                    <div className="skeleton" style={{ width: 100, height: 18, borderRadius: 4 }} />
+                                </div>
+                            </div>
+                            <div className="skeleton" style={{ width: "100%", height: 8, borderRadius: 99, marginBottom: 14 }} />
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <div className="skeleton" style={{ width: 80, height: 14, borderRadius: 4 }} />
+                                <div style={{ display: "flex", gap: 8 }}>
+                                    <div className="skeleton" style={{ width: 70, height: 30, borderRadius: "var(--radius-sm)" }} />
+                                    <div className="skeleton" style={{ width: 30, height: 30, borderRadius: "var(--radius-sm)" }} />
+                                </div>
+                            </div>
+                        </div>
                     ))}
                 </div>
             ) : !goals.length ? (

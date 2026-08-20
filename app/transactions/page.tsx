@@ -431,9 +431,16 @@ export default function TransactionsPage() {
 
                 {/* Rows */}
                 {loading ? (
-                    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="skeleton" style={{ height: 40 }} />
+                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderBottom: "1px solid var(--border-color)" }}>
+                                <div className="skeleton" style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0 }} />
+                                <div className="skeleton" style={{ height: 16, flex: 2, borderRadius: 4 }} />
+                                <div className="skeleton" style={{ height: 22, width: 80, borderRadius: 99, flexShrink: 0 }} />
+                                <div className="skeleton" style={{ height: 14, width: 90, borderRadius: 4, flexShrink: 0 }} />
+                                <div className="skeleton" style={{ height: 16, width: 100, borderRadius: 4, flexShrink: 0 }} />
+                                <div className="skeleton" style={{ height: 28, width: 28, borderRadius: "var(--radius-sm)", flexShrink: 0 }} />
+                            </div>
                         ))}
                     </div>
                 ) : !transactions.length ? (

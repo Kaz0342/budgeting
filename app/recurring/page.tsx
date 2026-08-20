@@ -347,9 +347,20 @@ export default function RecurringPage() {
 
             {/* List */}
             {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="skeleton" style={{ height: 80, borderRadius: "var(--radius-lg)" }} />
+                        <div key={i} className="card" style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
+                            <div className="skeleton" style={{ width: 42, height: 42, borderRadius: "50%", flexShrink: 0 }} />
+                            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                                <div className="skeleton" style={{ width: "60%", height: 14, borderRadius: 4 }} />
+                                <div className="skeleton" style={{ width: "40%", height: 12, borderRadius: 4 }} />
+                            </div>
+                            <div className="skeleton" style={{ width: 100, height: 16, borderRadius: 4, flexShrink: 0 }} />
+                            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                                <div className="skeleton" style={{ width: 32, height: 32, borderRadius: "var(--radius-sm)" }} />
+                                <div className="skeleton" style={{ width: 32, height: 32, borderRadius: "var(--radius-sm)" }} />
+                            </div>
+                        </div>
                     ))}
                 </div>
             ) : !recurrings.length ? (

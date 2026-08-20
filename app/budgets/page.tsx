@@ -287,7 +287,20 @@ export default function BudgetsPage() {
             {loading ? (
                 <div className="budgets-grid">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="skeleton" style={{ height: 120, borderRadius: "var(--radius-lg)" }} />
+                        <div key={i} className="card" style={{ padding: 18 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <div className="skeleton" style={{ width: 32, height: 32, borderRadius: "50%" }} />
+                                    <div className="skeleton" style={{ width: 90, height: 16, borderRadius: 4 }} />
+                                </div>
+                                <div className="skeleton" style={{ width: 36, height: 16, borderRadius: 4 }} />
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                <div className="skeleton" style={{ width: 100, height: 14, borderRadius: 4 }} />
+                                <div className="skeleton" style={{ width: 80, height: 14, borderRadius: 4 }} />
+                            </div>
+                            <div className="skeleton" style={{ width: "100%", height: 8, borderRadius: 99 }} />
+                        </div>
                     ))}
                 </div>
             ) : !budgets.length ? (

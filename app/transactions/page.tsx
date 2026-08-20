@@ -308,8 +308,10 @@ export default function TransactionsPage() {
                 fetch(`/api/transactions?${params}`),
                 fetch("/api/categories"),
             ]);
-            setTransactions(await tRes.json());
-            setCategories(await cRes.json());
+            const tData = await tRes.json();
+            const cData = await cRes.json();
+            setTransactions(Array.isArray(tData) ? tData : []);
+            setCategories(Array.isArray(cData) ? cData : []);
         } catch {
             showToast("Gagal memuat data", "error");
         } finally {

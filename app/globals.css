@@ -894,10 +894,10 @@ body {
 .skeleton {
   background: repeating-linear-gradient(
     45deg,
-    var(--bg-tertiary),
+    var(--bg-secondary),
+    var(--bg-secondary) 10px,
     var(--bg-tertiary) 10px,
-    var(--bg-hover) 10px,
-    var(--bg-hover) 20px
+    var(--bg-tertiary) 20px
   );
   background-size: 28px 28px;
   animation: brutalLoading 0.8s linear infinite;

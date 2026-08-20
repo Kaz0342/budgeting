@@ -890,17 +890,29 @@ body {
   max-width: 280px;
 }
 
-/* ─── LOADING SKELETON ─── */
+/* ─── LOADING SKELETON (Brutalist Stripes) ─── */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-tertiary) 0%,
-    var(--bg-hover) 50%,
-    var(--bg-tertiary) 100%
+  background: repeating-linear-gradient(
+    45deg,
+    var(--bg-tertiary),
+    var(--bg-tertiary) 10px,
+    var(--bg-hover) 10px,
+    var(--bg-hover) 20px
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  background-size: 28px 28px;
+  animation: brutalLoading 0.8s linear infinite;
   border-radius: var(--radius-sm);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+}
+
+@keyframes brutalLoading {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 28px 0;
+  }
 }
 
 /* ─── SECTION GRIDS ─── */

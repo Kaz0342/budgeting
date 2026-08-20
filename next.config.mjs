@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // serverComponentsExternalPackages dikeluarkan dari experimental di Next.js 14.1+
-    serverExternalPackages: ["@prisma/client", "prisma"],
+  experimental: {
+    // Prisma dijalankan di server-side, jangan di-bundle oleh webpack
+    serverComponentsExternalPackages: ["@prisma/client", "prisma"],
+  },
 };
 
 export default nextConfig;

@@ -37,13 +37,13 @@ export async function GET(request: Request) {
             include: { category: true },
         });
 
-        const totalIncome = transactions
-            .filter((t: (typeof transactions)[number]) => t.type === "INCOME")
-            .reduce((sum: number, t: (typeof transactions)[number]) => sum + t.amount, 0);
+        let totalIncome = 0;
+        let totalExpense = 0;
 
-        const totalExpense = transactions
-            .filter((t: (typeof transactions)[number]) => t.type === "EXPENSE")
-            .reduce((sum: number, t: (typeof transactions)[number]) => sum + t.amount, 0);
+        for (const t of transactions) {
+            if (t.type === "INCOME") totalIncome += t.amount;
+            else if (t.type === "EXPENSE") totalExpense += t.amount;
+        }
 
         // Breakdown pengeluaran per kategori
         const expenseByCategory = transactions
@@ -62,31 +62,33 @@ export async function GET(request: Request) {
                 return acc;
             }, {});
 
-        // Trend 6 bulan terakhir
-        const trend = [];
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(year, month - 1 - i, 1);
+        // Trend 6 bulan terakhir (di-fetch secara paralel, bukan sekuensial)
+        const trendPromises = Array.from({ length: 6 }).map((_, i) => {
+            const d = new Date(year, month - 6 + i, 1);
             const mStart = new Date(d.getFullYear(), d.getMonth(), 1);
             const mEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
 
-            const mTransactions = await prisma.transaction.findMany({
+            return prisma.transaction.findMany({
                 where: { date: { gte: mStart, lte: mEnd } },
                 select: { type: true, amount: true },
-            });
+            }).then(mTransactions => {
+                let mIncome = 0;
+                let mExpense = 0;
 
-            const mIncome = mTransactions
-                .filter((t: (typeof mTransactions)[number]) => t.type === "INCOME")
-                .reduce((sum: number, t: (typeof mTransactions)[number]) => sum + t.amount, 0);
-            const mExpense = mTransactions
-                .filter((t: (typeof mTransactions)[number]) => t.type === "EXPENSE")
-                .reduce((sum: number, t: (typeof mTransactions)[number]) => sum + t.amount, 0);
+                for (const t of mTransactions) {
+                    if (t.type === "INCOME") mIncome += t.amount;
+                    else if (t.type === "EXPENSE") mExpense += t.amount;
+                }
 
-            trend.push({
-                month: d.toLocaleString("id-ID", { month: "short" }),
-                income: mIncome,
-                expense: mExpense,
+                return {
+                    month: d.toLocaleString("id-ID", { month: "short" }),
+                    income: mIncome,
+                    expense: mExpense,
+                };
             });
-        }
+        });
+
+        const trend = await Promise.all(trendPromises);
 
         // 5 transaksi terbaru
         const recentTransactions = await prisma.transaction.findMany({

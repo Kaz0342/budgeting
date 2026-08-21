@@ -127,11 +127,20 @@ export async function GET(request: Request) {
             .filter((a: BudgetAlert) => a.percentage >= 80)
             .sort((a: BudgetAlert, b: BudgetAlert) => b.percentage - a.percentage);
 
+        // Breakdown pengeluaran per induk alokasi (Kebutuhan, Keinginan, Tabungan)
+        const allocationBreakdown: Record<string, number> = { "Kebutuhan": 0, "Keinginan": 0, "Tabungan": 0 };
+        for (const t of transactions) {
+            if (t.type === "EXPENSE" && t.category.allocation && t.category.allocation !== "-") {
+                allocationBreakdown[t.category.allocation] = (allocationBreakdown[t.category.allocation] || 0) + t.amount;
+            }
+        }
+
         return NextResponse.json({
             totalIncome,
             totalExpense,
             balance: totalIncome - totalExpense,
             expenseByCategory: Object.values(expenseByCategory),
+            allocationBreakdown,
             trend,
             recentTransactions,
             budgetAlerts,

@@ -18,6 +18,11 @@ interface SummaryData {
     totalIncome: number;
     totalExpense: number;
     balance: number;
+    allocationBreakdown: {
+        Kebutuhan: number;
+        Keinginan: number;
+        Tabungan: number;
+    };
 }
 
 // ─── Preset Rules ───
@@ -229,26 +234,20 @@ export default function AllocationPage() {
         }
     };
 
-    // Hitung alokasi
+    // Hitung alokasi berdasarkan data REAL per-bucket
     const income = summary?.totalIncome ?? 0;
-    const totalExpense = summary?.totalExpense ?? 0;
-    const balance = summary?.balance ?? 0;
+    const alloc = summary?.allocationBreakdown ?? { Kebutuhan: 0, Keinginan: 0, Tabungan: 0 };
 
     const recNeeds = Math.round(income * activeRule.needs / 100);
     const recWants = Math.round(income * activeRule.wants / 100);
     const recSavings = Math.round(income * activeRule.savings / 100);
 
-    // Aktual: expense = needs + wants (kita tunjukkan expense total sbg gabungan kebutuhan+keinginan)
-    // Tabungan = balance (income - expense)
-    // Untuk breakdown needs vs wants: kita tampilkan expense sbg kebutuhan saja, biar user aware
-    const actualSavings = Math.max(0, balance);
-    const actualSpending = totalExpense;  // kebutuhan + keinginan gabung
-    // Needs portion = estimated 2/3 of spending (default, user bisa lihat breakdown)
-    // Actually kita tampilkan spending total vs recNeeds+recWants, dan savings vs recSavings
-    const recSpending = recNeeds + recWants;
+    const actualNeeds = alloc.Kebutuhan;
+    const actualWants = alloc.Keinginan;
+    const actualSavings = alloc.Tabungan;
 
-    const isSpendingOver = actualSpending > recSpending;
-    const isSavingsShort = actualSavings < recSavings;
+    const isNeedsOver = actualNeeds > recNeeds;
+    const isWantsOver = actualWants > recWants;
 
     return (
         <div>
@@ -430,22 +429,30 @@ export default function AllocationPage() {
                 </div>
             ) : (
                 <>
-                    {/* Bucket Cards */}
-                    <div className="budgets-grid" style={{ marginBottom: 20 }}>
-                        {/* Pengeluaran (Kebutuhan + Keinginan gabung) */}
+                    {/* Bucket Cards — 3 Induk Alokasi */}
+                    <div className="budgets-grid" style={{ marginBottom: 20, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
                         <BucketCard
                             emoji="🏠"
-                            label="Pengeluaran"
-                            sublabel={`Kebutuhan + Keinginan (${activeRule.needs + activeRule.wants}% ideal)`}
-                            recommended={recSpending}
-                            actual={actualSpending}
+                            label="Kebutuhan"
+                            sublabel={`Biaya hidup wajib (${activeRule.needs}% ideal)`}
+                            recommended={recNeeds}
+                            actual={actualNeeds}
                             color="#6366f1"
-                            isOver={isSpendingOver}
+                            isOver={isNeedsOver}
+                        />
+                        <BucketCard
+                            emoji="🎮"
+                            label="Keinginan"
+                            sublabel={`Hobi, lifestyle, wishlist (${activeRule.wants}% ideal)`}
+                            recommended={recWants}
+                            actual={actualWants}
+                            color="#f59e0b"
+                            isOver={isWantsOver}
                         />
                         <BucketCard
                             emoji="💰"
                             label="Tabungan"
-                            sublabel={`Saldo bersih bulan ini (${activeRule.savings}% ideal)`}
+                            sublabel={`Dana darurat & simpanan (${activeRule.savings}% ideal)`}
                             recommended={recSavings}
                             actual={actualSavings}
                             color="#10b981"
@@ -455,33 +462,33 @@ export default function AllocationPage() {
 
                     {/* Summary status */}
                     <div className="card" style={{
-                        background: (!isSpendingOver && !isSavingsShort)
+                        background: (!isNeedsOver && !isWantsOver)
                             ? "linear-gradient(135deg, #d1fae5, #a7f3d0)"
                             : "linear-gradient(135deg, #fef3c7, #fde68a)",
                         border: "none",
                     }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                             <span style={{ fontSize: 32 }}>
-                                {!isSpendingOver && !isSavingsShort ? "🎉" : "⚠️"}
+                                {!isNeedsOver && !isWantsOver ? "🎉" : "⚠️"}
                             </span>
                             <div>
                                 <div style={{
                                     fontWeight: 700,
                                     fontSize: 15,
-                                    color: !isSpendingOver && !isSavingsShort ? "#065f46" : "#92400e",
+                                    color: !isNeedsOver && !isWantsOver ? "#065f46" : "#92400e",
                                 }}>
-                                    {!isSpendingOver && !isSavingsShort
+                                    {!isNeedsOver && !isWantsOver
                                         ? "Lo on track! Keuangan bulan ini sesuai metode " + activeRule.label
                                         : `Ada yang perlu diperbaiki — review pengeluaran lo, King`}
                                 </div>
                                 <div style={{
                                     fontSize: 13,
                                     marginTop: 4,
-                                    color: !isSpendingOver && !isSavingsShort ? "#047857" : "#b45309",
+                                    color: !isNeedsOver && !isWantsOver ? "#047857" : "#b45309",
                                 }}>
-                                    {isSpendingOver && `Pengeluaran kelebihan ${formatRupiah(actualSpending - recSpending)} dari target. `}
-                                    {isSavingsShort && `Tabungan kurang ${formatRupiah(recSavings - actualSavings)} dari target.`}
-                                    {!isSpendingOver && !isSavingsShort && `Pengeluaran dan tabungan lo sesuai target metode ${activeRule.label} bulan ini.`}
+                                    {isNeedsOver && `Kebutuhan kelebihan ${formatRupiah(actualNeeds - recNeeds)} dari target. `}
+                                    {isWantsOver && `Keinginan kelebihan ${formatRupiah(actualWants - recWants)} dari target. `}
+                                    {!isNeedsOver && !isWantsOver && `Semua bucket alokasi lo sesuai target metode ${activeRule.label} bulan ini.`}
                                 </div>
                             </div>
                         </div>

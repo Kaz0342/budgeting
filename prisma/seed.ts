@@ -1,4 +1,4 @@
-// Seed script - bikin kategori default buat pertama kali setup
+// Seed script — Kategori Fixed + Mapping Alokasi
 // Jalankan: npx ts-node prisma/seed.ts
 
 import { PrismaClient } from "@prisma/client";
@@ -6,150 +6,55 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const categories = [
-    // Pengeluaran
-    { name: "Makan & Minum", type: "EXPENSE", icon: "🍜", color: "#f97316" },
-    { name: "Transport", type: "EXPENSE", icon: "🚌", color: "#3b82f6" },
-    { name: "Hiburan", type: "EXPENSE", icon: "🎮", color: "#8b5cf6" },
-    { name: "Belanja", type: "EXPENSE", icon: "🛒", color: "#ec4899" },
-    { name: "Kesehatan", type: "EXPENSE", icon: "💊", color: "#10b981" },
-    { name: "Pendidikan", type: "EXPENSE", icon: "📚", color: "#6366f1" },
-    { name: "Tagihan", type: "EXPENSE", icon: "📱", color: "#ef4444" },
-    { name: "Lain-lain", type: "EXPENSE", icon: "📦", color: "#6b7280" },
-    // Pemasukan
-    { name: "Gaji", type: "INCOME", icon: "💼", color: "#22c55e" },
-    { name: "Freelance", type: "INCOME", icon: "💻", color: "#14b8a6" },
-    { name: "Investasi", type: "INCOME", icon: "📈", color: "#f59e0b" },
-    { name: "Bonus", type: "INCOME", icon: "🎁", color: "#84cc16" },
+    // ═══════════════════════════════════════
+    // PENGELUARAN — Induk: Kebutuhan
+    // ═══════════════════════════════════════
+    { name: "Makan & Minuman",          type: "EXPENSE", icon: "🍜", color: "#f97316", allocation: "Kebutuhan" },
+    { name: "Bensin & Transportasi",    type: "EXPENSE", icon: "⛽", color: "#3b82f6", allocation: "Kebutuhan" },
+    { name: "Kos",                      type: "EXPENSE", icon: "🏠", color: "#8b5cf6", allocation: "Kebutuhan" },
+    { name: "Internet & Komunikasi",    type: "EXPENSE", icon: "📶", color: "#06b6d4", allocation: "Kebutuhan" },
+    { name: "Personal Care",            type: "EXPENSE", icon: "🧴", color: "#ec4899", allocation: "Kebutuhan" },
+
+    // ═══════════════════════════════════════
+    // PENGELUARAN — Induk: Keinginan
+    // ═══════════════════════════════════════
+    { name: "Hiburan, Jajan, Lifestyle", type: "EXPENSE", icon: "🎮", color: "#f59e0b", allocation: "Keinginan" },
+    { name: "Motor",                     type: "EXPENSE", icon: "🏍️", color: "#ef4444", allocation: "Keinginan" },
+    { name: "Gadget",                    type: "EXPENSE", icon: "📱", color: "#6366f1", allocation: "Keinginan" },
+
+    // ═══════════════════════════════════════
+    // PENGELUARAN — Induk: Tabungan
+    // ═══════════════════════════════════════
+    { name: "Tabungan, Dana darurat",    type: "EXPENSE", icon: "🏦", color: "#10b981", allocation: "Tabungan" },
+
+    // ═══════════════════════════════════════
+    // PEMASUKAN — Tidak punya induk alokasi
+    // ═══════════════════════════════════════
+    { name: "Gaji",            type: "INCOME", icon: "💼", color: "#22c55e", allocation: "-" },
+    { name: "Transfer Masuk",  type: "INCOME", icon: "💸", color: "#14b8a6", allocation: "-" },
 ];
 
 async function main() {
-    console.log("🌱 Seeding database...");
+    console.log("🌱 Resetting & seeding database...");
 
-    // Hapus data lama kalau ada
+    // Wipe semua data terkait (urutan penting karena foreign keys)
+    console.log("  🗑️ Menghapus transaksi...");
     await prisma.transaction.deleteMany();
+    console.log("  🗑️ Menghapus budget...");
     await prisma.budget.deleteMany();
+    console.log("  🗑️ Menghapus recurring...");
+    await prisma.recurringTransaction.deleteMany();
+    console.log("  🗑️ Menghapus kategori lama...");
     await prisma.category.deleteMany();
 
-    // Insert kategori
+    // Insert kategori baru
+    console.log("  📦 Memasukkan kategori baru...");
     for (const cat of categories) {
         await prisma.category.create({ data: cat });
     }
 
-    // Bikin beberapa transaksi contoh buat bulan ini
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-
-    const makanCat = await prisma.category.findFirst({
-        where: { name: "Makan & Minum" },
-    });
-    const gajiCat = await prisma.category.findFirst({ where: { name: "Gaji" } });
-    const transportCat = await prisma.category.findFirst({
-        where: { name: "Transport" },
-    });
-    const hiburanCat = await prisma.category.findFirst({
-        where: { name: "Hiburan" },
-    });
-
-    if (gajiCat) {
-        await prisma.transaction.create({
-            data: {
-                amount: 5000000,
-                type: "INCOME",
-                description: "Gaji bulan ini",
-                date: new Date(year, month, 1),
-                categoryId: gajiCat.id,
-            },
-        });
-    }
-
-    if (makanCat) {
-        await prisma.transaction.create({
-            data: {
-                amount: 85000,
-                type: "EXPENSE",
-                description: "Makan siang sama temen",
-                date: new Date(year, month, 3),
-                categoryId: makanCat.id,
-            },
-        });
-        await prisma.transaction.create({
-            data: {
-                amount: 45000,
-                type: "EXPENSE",
-                description: "Kopi sama snack",
-                date: new Date(year, month, 5),
-                categoryId: makanCat.id,
-            },
-        });
-        await prisma.transaction.create({
-            data: {
-                amount: 120000,
-                type: "EXPENSE",
-                description: "Makan malam keluarga",
-                date: new Date(year, month, 10),
-                categoryId: makanCat.id,
-            },
-        });
-    }
-
-    if (transportCat) {
-        await prisma.transaction.create({
-            data: {
-                amount: 30000,
-                type: "EXPENSE",
-                description: "Grab ke kampus",
-                date: new Date(year, month, 4),
-                categoryId: transportCat.id,
-            },
-        });
-    }
-
-    if (hiburanCat) {
-        await prisma.transaction.create({
-            data: {
-                amount: 150000,
-                type: "EXPENSE",
-                description: "Nonton bioskop",
-                date: new Date(year, month, 8),
-                categoryId: hiburanCat.id,
-            },
-        });
-    }
-
-    // Bikin contoh budget
-    if (makanCat) {
-        await prisma.budget.create({
-            data: {
-                categoryId: makanCat.id,
-                limitAmount: 800000,
-                month: month + 1,
-                year,
-            },
-        });
-    }
-    if (transportCat) {
-        await prisma.budget.create({
-            data: {
-                categoryId: transportCat.id,
-                limitAmount: 300000,
-                month: month + 1,
-                year,
-            },
-        });
-    }
-    if (hiburanCat) {
-        await prisma.budget.create({
-            data: {
-                categoryId: hiburanCat.id,
-                limitAmount: 500000,
-                month: month + 1,
-                year,
-            },
-        });
-    }
-
-    console.log("✅ Seeding selesai!");
+    const count = await prisma.category.count();
+    console.log(`✅ Seeding selesai! Total ${count} kategori berhasil ditanam.`);
 }
 
 main()

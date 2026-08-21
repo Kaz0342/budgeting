@@ -14,6 +14,7 @@ model Category {
   type                  String
   icon                  String                 @default("💰")
   color                 String                 @default("#6366f1")
+  allocation            String                 @default("Kebutuhan") // "Kebutuhan" | "Keinginan" | "Tabungan" | "-" (untuk INCOME)
   transactions          Transaction[]
   budgets               Budget[]
   recurringTransactions RecurringTransaction[]

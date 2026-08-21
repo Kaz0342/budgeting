@@ -3,6 +3,7 @@
 // Transactions Page — full list, filter, add/delete modal
 import { useEffect, useState, useCallback, useRef } from "react";
 import anime from "animejs";
+import { AddCategoryModal } from "@/components/AddCategoryModal";
 
 // ─── Types ───
 interface Category {
@@ -281,6 +282,7 @@ export default function TransactionsPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAdd, setShowAdd] = useState(false);
+    const [showAddCategory, setShowAddCategory] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
     const [filterType, setFilterType] = useState("");
@@ -361,6 +363,9 @@ export default function TransactionsPage() {
                     >
                         ⬇️ Export CSV
                     </a>
+                    <button className="btn btn-secondary" onClick={() => setShowAddCategory(true)} id="add-category-btn">
+                        + Kategori Baru
+                    </button>
                     <button className="btn btn-primary" onClick={() => setShowAdd(true)} id="add-transaction-btn">
                         + Tambah Transaksi
                     </button>
@@ -489,6 +494,15 @@ export default function TransactionsPage() {
                 <AddTransactionModal
                     categories={categories}
                     onClose={() => setShowAdd(false)}
+                    onSuccess={(msg) => {
+                        showToast(msg);
+                        fetchAll();
+                    }}
+                />
+            )}
+            {showAddCategory && (
+                <AddCategoryModal
+                    onClose={() => setShowAddCategory(false)}
                     onSuccess={(msg) => {
                         showToast(msg);
                         fetchAll();

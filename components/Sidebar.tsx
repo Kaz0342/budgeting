@@ -7,11 +7,12 @@ import { useEffect, useState } from "react";
 
 const navItems = [
     { href: "/", icon: "📊", label: "Dashboard" },
+    { href: "/categories", icon: "🗂️", label: "Kategori" },
     { href: "/transactions", icon: "💸", label: "Transaksi" },
-    { href: "/budgets", icon: "🎯", label: "Budget" },
-    { href: "/allocation", icon: "⚖️", label: "Alokasi" },
     { href: "/recurring", icon: "🔁", label: "Rutin" },
+    { href: "/budgets", icon: "🎯", label: "Budget" },
     { href: "/goals", icon: "🏆", label: "Goals" },
+    { href: "/allocation", icon: "⚖️", label: "Alokasi" },
 ];
 
 // ─── Real-time Clock ───

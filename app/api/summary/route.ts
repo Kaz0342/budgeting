@@ -135,6 +135,22 @@ export async function GET(request: Request) {
             }
         }
 
+        // Trend Mingguan untuk bulan ini (Week 1 - Week 5)
+        const weeklyTrend = Array.from({ length: 5 }).map((_, i) => ({
+            name: `Mg ${i + 1}`,
+            income: 0,
+            expense: 0
+        }));
+
+        for (const t of transactions) {
+            const d = new Date(t.date).getDate();
+            let weekIdx = Math.floor((d - 1) / 7);
+            if (weekIdx > 4) weekIdx = 4; // Cap max di minggu ke-5
+            
+            if (t.type === "INCOME") weeklyTrend[weekIdx].income += t.amount;
+            else if (t.type === "EXPENSE") weeklyTrend[weekIdx].expense += t.amount;
+        }
+
         return NextResponse.json({
             totalIncome,
             totalExpense,
@@ -142,6 +158,7 @@ export async function GET(request: Request) {
             expenseByCategory: Object.values(expenseByCategory),
             allocationBreakdown,
             trend,
+            weeklyTrend,
             recentTransactions,
             budgetAlerts,
         });

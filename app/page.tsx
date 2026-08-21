@@ -14,6 +14,7 @@ interface SummaryData {
     balance: number;
     expenseByCategory: { name: string; icon: string; color: string; amount: number }[];
     trend: { month: string; income: number; expense: number }[];
+    weeklyTrend: { name: string; income: number; expense: number }[];
     recentTransactions: {
         id: number;
         amount: number;
@@ -70,8 +71,9 @@ export default function DashboardPage() {
     const [dismissAlerts, setDismissAlerts] = useState(false);
 
     const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
+    const [month, setMonth] = useState(now.getMonth() + 1);
+    const [year, setYear] = useState(now.getFullYear());
+    const [chartView, setChartView] = useState<"6months" | "weekly">("weekly");
 
     const fetchSummary = useCallback(async () => {
         setLoading(true);
@@ -88,14 +90,40 @@ export default function DashboardPage() {
 
     useEffect(() => { fetchSummary(); }, [fetchSummary]);
 
-    const monthName = now.toLocaleString("id-ID", { month: "long", year: "numeric" });
+    const monthName = new Date(year, month - 1).toLocaleString("id-ID", { month: "long", year: "numeric" });
 
     return (
         <div>
             {/* Header */}
-            <div className="page-header">
-                <h1 className="page-title">Dashboard</h1>
-                <p className="page-subtitle">Ringkasan keuangan bulan {monthName}</p>
+            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+                <div>
+                    <h1 className="page-title">Dashboard</h1>
+                    <p className="page-subtitle">Ringkasan keuangan bulan {monthName}</p>
+                </div>
+                <div style={{ display: "flex", gap: 10 }}>
+                    <select
+                        className="input"
+                        value={month}
+                        onChange={(e) => setMonth(Number(e.target.value))}
+                        style={{ width: "auto", padding: "6px 12px", fontSize: 13 }}
+                    >
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                                {new Date(0, i).toLocaleString("id-ID", { month: "long" })}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        className="input"
+                        value={year}
+                        onChange={(e) => setYear(Number(e.target.value))}
+                        style={{ width: "auto", padding: "6px 12px", fontSize: 13 }}
+                    >
+                        {[year - 1, year, year + 1].map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             {/* Budget Alert Banner */}
@@ -184,14 +212,23 @@ export default function DashboardPage() {
             <div className="charts-grid">
                 {/* Area Chart - Trend */}
                 <div className="card">
-                    <div className="card-header">
-                        <h2 className="card-title">Tren 6 Bulan Terakhir</h2>
+                    <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2 className="card-title">Tren Pemasukan & Pengeluaran</h2>
+                        <select
+                            className="input"
+                            value={chartView}
+                            onChange={(e) => setChartView(e.target.value as "6months" | "weekly")}
+                            style={{ width: "auto", padding: "4px 8px", fontSize: 12 }}
+                        >
+                            <option value="weekly">Per Minggu (Bulan Ini)</option>
+                            <option value="6months">6 Bulan Terakhir</option>
+                        </select>
                     </div>
                     {loading ? (
-                        <div className="skeleton" style={{ height: 220, borderRadius: "var(--radius-sm)" }} />
+                        <div className="skeleton" style={{ height: 380, borderRadius: "var(--radius-sm)" }} />
                     ) : (
-                        <ResponsiveContainer width="100%" height={220}>
-                            <AreaChart data={data?.trend ?? []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                        <ResponsiveContainer width="100%" height={380}>
+                            <AreaChart data={chartView === "6months" ? (data?.trend ?? []) : (data?.weeklyTrend ?? [])} margin={{ top: 20, right: 5, left: -10, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -203,7 +240,7 @@ export default function DashboardPage() {
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                                <XAxis dataKey={chartView === "6months" ? "month" : "name"} tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={(v: any) => `${(Number(v) / 1000000).toFixed(1)}M`} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fill="url(#incomeGrad)" name="income" />
@@ -219,23 +256,23 @@ export default function DashboardPage() {
                         <h2 className="card-title">Pengeluaran per Kategori</h2>
                     </div>
                     {loading ? (
-                        <div className="skeleton" style={{ height: 220, borderRadius: "var(--radius-sm)" }} />
+                        <div className="skeleton" style={{ height: 380, borderRadius: "var(--radius-sm)" }} />
                     ) : !data?.expenseByCategory?.length ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">📊</div>
                             <div className="empty-state-text">Belum ada pengeluaran bulan ini</div>
                         </div>
                     ) : (
-                        <ResponsiveContainer width="100%" height={220}>
-                            <PieChart>
+                        <ResponsiveContainer width="100%" height={380}>
+                            <PieChart margin={{ top: 20, right: 0, bottom: 20, left: 0 }}>
                                 <Pie
                                     data={data.expenseByCategory}
                                     dataKey="amount"
                                     nameKey="name"
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={55}
-                                    outerRadius={80}
+                                    innerRadius={60}
+                                    outerRadius={90}
                                     paddingAngle={3}
                                 >
                                     {data.expenseByCategory.map((entry, i) => (
@@ -243,7 +280,13 @@ export default function DashboardPage() {
                                     ))}
                                 </Pie>
                                 <Tooltip formatter={(v: string | number | (string | number)[] | undefined) => formatRupiah(Number(v ?? 0))} />
-                                <Legend iconType="circle" iconSize={8} formatter={(v: string | number) => <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{String(v)}</span>} />
+                                <Legend 
+                                    verticalAlign="bottom" 
+                                    wrapperStyle={{ paddingTop: "20px" }}
+                                    iconType="circle" 
+                                    iconSize={8} 
+                                    formatter={(v: string | number) => <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{String(v)}</span>} 
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     )}

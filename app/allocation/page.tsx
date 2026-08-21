@@ -84,6 +84,7 @@ function BucketCard({
     actual,
     color,
     isOver,
+    isSavings = false,
 }: {
     emoji: string;
     label: string;
@@ -92,13 +93,17 @@ function BucketCard({
     actual: number;
     color: string;
     isOver: boolean;
+    isSavings?: boolean;
 }) {
     const pct = recommended > 0 ? clamp(Math.round((actual / recommended) * 100), 0, 999) : 0;
     const barPct = clamp(pct, 0, 100);
     const diff = actual - recommended;
+    
+    // For savings, actual < recommended is BAD (short). For expenses, actual > recommended is BAD (over).
+    const isBad = isSavings ? diff < 0 : isOver;
 
     return (
-        <div className="card" style={{ border: isOver ? `2px solid var(--danger)` : "1px solid var(--border-color)" }}>
+        <div className="card" style={{ border: isBad ? `2px solid var(--danger)` : "1px solid var(--border-color)" }}>
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
                 <div style={{
@@ -118,7 +123,7 @@ function BucketCard({
                     <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>{label}</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{sublabel}</div>
                 </div>
-                {isOver && (
+                {isBad && (
                     <div style={{
                         marginLeft: "auto",
                         background: "#fee2e2",
@@ -128,7 +133,7 @@ function BucketCard({
                         padding: "3px 8px",
                         borderRadius: 99,
                     }}>
-                        ⚠️ LEWAT
+                        ⚠️ {isSavings ? "KURANG" : "LEWAT"}
                     </div>
                 )}
             </div>
@@ -137,7 +142,7 @@ function BucketCard({
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
                 <div>
                     <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>Aktual</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: isOver ? "var(--danger)" : color, marginTop: 2 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: isBad ? "var(--danger)" : color, marginTop: 2 }}>
                         {formatRupiah(actual)}
                     </div>
                 </div>
@@ -156,19 +161,23 @@ function BucketCard({
                         height: "100%",
                         width: `${barPct}%`,
                         borderRadius: 99,
-                        background: isOver ? "var(--danger)" : color,
+                        background: isBad ? "var(--danger)" : color,
                         transition: "width 0.5s ease",
                     }}
                 />
             </div>
 
             {/* Diff */}
-            <div style={{ fontSize: 12, color: isOver ? "var(--danger)" : "var(--success)", fontWeight: 600 }}>
+            <div style={{ fontSize: 12, color: isBad ? "var(--danger)" : "var(--success)", fontWeight: 600 }}>
                 {diff === 0
                     ? "✅ Pas banget!"
-                    : diff > 0
-                        ? `😬 Kelebihan ${formatRupiah(diff)}`
-                        : `✅ Hemat ${formatRupiah(Math.abs(diff))}`
+                    : isSavings
+                        ? diff > 0
+                            ? `✅ Lebihan nabung ${formatRupiah(diff)}`
+                            : `😬 Kurang nabung ${formatRupiah(Math.abs(diff))}`
+                        : diff > 0
+                            ? `😬 Kelebihan ${formatRupiah(diff)}`
+                            : `✅ Hemat ${formatRupiah(Math.abs(diff))}`
                 }
             </div>
         </div>
@@ -457,6 +466,7 @@ export default function AllocationPage() {
                             actual={actualSavings}
                             color="#10b981"
                             isOver={false}
+                            isSavings={true}
                         />
                     </div>
 

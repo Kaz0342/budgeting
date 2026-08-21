@@ -3,7 +3,7 @@
 // Transactions Page — full list, filter, add/delete modal
 import { useEffect, useState, useCallback, useRef } from "react";
 import anime from "animejs";
-import { AddCategoryModal } from "@/components/AddCategoryModal";
+import { ManageCategoriesModal } from "@/components/ManageCategoriesModal";
 
 // ─── Types ───
 interface Category {
@@ -363,8 +363,8 @@ export default function TransactionsPage() {
                     >
                         ⬇️ Export CSV
                     </a>
-                    <button className="btn btn-secondary" onClick={() => setShowAddCategory(true)} id="add-category-btn">
-                        + Kategori Baru
+                    <button className="btn btn-secondary" onClick={() => setShowAddCategory(true)} id="manage-category-btn">
+                        ⚙️ Kelola Kategori
                     </button>
                     <button className="btn btn-primary" onClick={() => setShowAdd(true)} id="add-transaction-btn">
                         + Tambah Transaksi
@@ -501,7 +501,8 @@ export default function TransactionsPage() {
                 />
             )}
             {showAddCategory && (
-                <AddCategoryModal
+                <ManageCategoriesModal
+                    categories={categories}
                     onClose={() => setShowAddCategory(false)}
                     onSuccess={(msg) => {
                         showToast(msg);

@@ -150,13 +150,17 @@ function SetorModal({
                             <label className="form-label" htmlFor="setor-amount">Jumlah Setoran (Rp)</label>
                             <input
                                 id="setor-amount"
-                                type="number"
-                                min="1"
-                                max={remaining}
-                                placeholder="Contoh: 500000"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder={`Maks: ${formatRupiah(remaining)}`}
                                 className="form-input"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
+                                value={amount ? Number(amount).toLocaleString('id-ID') : ""}
+                                onChange={(e) => {
+                                    const raw = e.target.value.replace(/\D/g, "");
+                                    if (!raw || parseInt(raw) <= remaining) {
+                                        setAmount(raw);
+                                    }
+                                }}
                                 required
                                 autoFocus
                             />
@@ -268,9 +272,9 @@ function AddGoalModal({
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="goal-target">Target (Rp)</label>
-                            <input id="goal-target" type="number" min="1" placeholder="Contoh: 15000000"
-                                className="form-input" value={form.targetAmount}
-                                onChange={(e) => setForm(p => ({ ...p, targetAmount: e.target.value }))} required />
+                            <input id="goal-target" type="text" inputMode="numeric" placeholder="Contoh: 15.000.000"
+                                className="form-input" value={form.targetAmount ? Number(form.targetAmount).toLocaleString('id-ID') : ""}
+                                onChange={(e) => setForm(p => ({ ...p, targetAmount: e.target.value.replace(/\D/g, "") }))} required />
                         </div>
 
                         <div className="form-group">

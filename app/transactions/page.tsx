@@ -113,7 +113,12 @@ function AddTransactionModal({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value, ...(name === "type" ? { categoryId: "" } : {}) }));
+        if (name === "amount") {
+            const rawValue = value.replace(/\D/g, "");
+            setForm((prev) => ({ ...prev, [name]: rawValue }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value, ...(name === "type" ? { categoryId: "" } : {}) }));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -170,11 +175,11 @@ function AddTransactionModal({
                             <input
                                 id="amount"
                                 name="amount"
-                                type="number"
-                                min="1"
-                                placeholder="Contoh: 85000"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="Contoh: 85.000"
                                 className="form-input"
-                                value={form.amount}
+                                value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ""}
                                 onChange={handleChange}
                                 required
                             />

@@ -110,7 +110,12 @@ function AddRecurringModal({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value, ...(name === "type" ? { categoryId: "" } : {}) }));
+        if (name === "amount") {
+            const rawValue = value.replace(/\D/g, "");
+            setForm((prev) => ({ ...prev, [name]: rawValue }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value, ...(name === "type" ? { categoryId: "" } : {}) }));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -162,8 +167,8 @@ function AddRecurringModal({
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="rec-amount">Jumlah (Rp)</label>
-                            <input id="rec-amount" name="amount" type="number" min="1" placeholder="Contoh: 150000"
-                                className="form-input" value={form.amount} onChange={handleChange} required />
+                            <input id="rec-amount" name="amount" type="text" inputMode="numeric" placeholder="Contoh: 150.000"
+                                className="form-input" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ""} onChange={handleChange} required />
                         </div>
 
                         <div className="form-group">

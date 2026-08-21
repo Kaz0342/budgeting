@@ -163,12 +163,12 @@ function SetBudgetModal({
                             <label className="form-label" htmlFor="budget-limit">Batas Budget (Rp)</label>
                             <input
                                 id="budget-limit"
-                                type="number"
-                                min="1"
-                                placeholder="Contoh: 800000"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="Contoh: 800.000"
                                 className="form-input"
-                                value={form.limitAmount}
-                                onChange={(e) => setForm((p) => ({ ...p, limitAmount: e.target.value }))}
+                                value={form.limitAmount ? Number(form.limitAmount).toLocaleString('id-ID') : ""}
+                                onChange={(e) => setForm((p) => ({ ...p, limitAmount: e.target.value.replace(/\D/g, "") }))}
                                 required
                             />
                         </div>
